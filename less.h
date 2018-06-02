@@ -26,6 +26,7 @@
  * The <> make cc search for it in -I., not srcdir.
  */
 #include <defines.h>
+#include "colorMe_interface.h"
 
 #ifdef _SEQUENT_
 /*

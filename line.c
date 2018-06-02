@@ -20,6 +20,7 @@
 
 static char *linebuf = NULL;	/* Buffer which holds the current output line */
 static char *attr = NULL;	/* Extension of linebuf to hold attributes */
+static char *color = NULL;	/* Extension of linebuf to hold colors */
 public int size_linebuf = 0;	/* Size of line buffer (and attr buffer) */
 
 static int cshift;		/* Current left-shift of output line buffer */
@@ -83,6 +84,7 @@ init_line()
 
 	linebuf = (char *) ecalloc(LINEBUF_SIZE, sizeof(char));
 	attr = (char *) ecalloc(LINEBUF_SIZE, sizeof(char));
+	color = (char *) ecalloc(LINEBUF_SIZE, sizeof(char));
 	size_linebuf = LINEBUF_SIZE;
 }
 
@@ -99,12 +101,16 @@ expand_linebuf()
 #if HAVE_REALLOC
 	char *new_buf = (char *) realloc(linebuf, new_size);
 	char *new_attr = (char *) realloc(attr, new_size);
+	char *new_color = (char *) realloc(color, new_size);
 #else
 	char *new_buf = (char *) calloc(new_size, sizeof(char));
 	char *new_attr = (char *) calloc(new_size, sizeof(char));
+	char *new_color = (char *) calloc(new_size, sizeof(char));
 #endif
-	if (new_buf == NULL || new_attr == NULL)
+	if (new_buf == NULL || new_attr == NULL || new_color == NULL)
 	{
+		if (new_color != NULL)
+			free(new_color);
 		if (new_attr != NULL)
 			free(new_attr);
 		if (new_buf != NULL)
@@ -118,6 +124,7 @@ expand_linebuf()
 	#if 0
 	memset(new_buf + size_linebuf, 0, new_size - size_linebuf);
 	memset(new_attr + size_linebuf, 0, new_size - size_linebuf);
+	memset(new_color + size_linebuf, 0, new_size - size_linebuf);
 	#endif
 #else
 	/*
@@ -125,11 +132,14 @@ expand_linebuf()
 	 */
 	memcpy(new_buf, linebuf, size_linebuf * sizeof(char));
 	memcpy(new_attr, attr, size_linebuf * sizeof(char));
+	memcpy(new_color, color, size_linebuf * sizeof(char));
+	free(color);
 	free(attr);
 	free(linebuf);
 #endif
 	linebuf = new_buf;
 	attr = new_attr;
+	color = new_color;
 	size_linebuf = new_size;
 	return 0;
 }
@@ -192,6 +202,7 @@ plinenum(pos)
 	if (status_col)
 	{
 		linebuf[curr] = ' ';
+		color[curr] = 0;
 		if (start_attnpos != NULL_POSITION &&
 		    pos >= start_attnpos && pos < end_attnpos)
 			attr[curr] = AT_NORMAL|AT_HILITE;
@@ -228,6 +239,7 @@ plinenum(pos)
 	while (column < lmargin)
 	{
 		linebuf[curr] = ' ';
+		color[curr] = 0;
 		attr[curr++] = AT_NORMAL;
 		column++;
 	}
@@ -268,11 +280,16 @@ pshift(shift)
 		{
 			/* Keep cumulative effect.  */
 			linebuf[to] = c;
-			attr[to++] = attr[from++];
+			attr[to] = attr[from];
+			color[to] = color[from];
+			to++;
+			from++;
 			while (from < curr && linebuf[from])
 			{
 				linebuf[to] = linebuf[from];
-				attr[to++] = attr[from];
+				attr[to] = attr[from];
+				color[to] = color[from];
+				to++;
 				if (!is_ansi_middle(linebuf[from++]))
 					break;
 			} 
@@ -307,6 +324,7 @@ pshift(shift)
 		if (width == 2 && shift - shifted == 1) {
 			/* Should never happen when called by pshift_all().  */
 			attr[to] = attr[from];
+			color[to] = color[from];
 			/*
 			 * Assume a wide_char will never be the first half of a
 			 * combining_char pair, so reset prev_ch in case we're
@@ -345,7 +363,10 @@ pshift(shift)
 	while (from < curr)
 	{
 		linebuf[to] = linebuf[from];
-		attr[to++] = attr[from++];
+		attr[to] = attr[from];
+		color[to] = color[from];
+		to++;
+		from++;
 	}
 	curr = to;
 	column -= shifted;
@@ -571,6 +592,7 @@ store_char(ch, a, rep, pos)
 	int w;
 	int replen;
 	char cs;
+	int col=0;
 
 	w = (a & (AT_UNDERLINE|AT_BOLD));	/* Pre-use w.  */
 	if (w != AT_NORMAL)
@@ -595,6 +617,9 @@ store_char(ch, a, rep, pos)
 		}
 	}
 #endif
+
+	if(ColorMe_HasColor(pos))
+		col = ColorMe_GetColor(pos);
 
 	if (ctldisp == OPT_ONPLUS && in_ansi_esc_seq())
 	{
@@ -652,6 +677,7 @@ store_char(ch, a, rep, pos)
 	{
 		linebuf[curr] = *rep++;
 		attr[curr] = a;
+		color[curr] = col;
 		curr++;
 	}
 	column += w;
@@ -1070,12 +1096,18 @@ pdone(endline, forw)
 		 * at the top of the screen anyway.
 		 */
 		linebuf[curr] = ' ';
-		attr[curr++] = AT_NORMAL;
+		attr[curr] = AT_NORMAL;
+		color[curr] = 0;
+
+		curr++;
 		linebuf[curr] = '\b'; 
-		attr[curr++] = AT_NORMAL;
+		attr[curr] = AT_NORMAL;
+		color[curr] = 0;
+		curr++;
 	}
 	linebuf[curr] = '\0';
 	attr[curr] = AT_NORMAL;
+	color[curr] = 0;
 }
 
 /*
@@ -1087,6 +1119,7 @@ set_status_col(c)
 {
 	linebuf[0] = c;
 	attr[0] = AT_NORMAL|AT_HILITE;
+	color[0] = 0;
 }
 
 /*
@@ -1095,9 +1128,10 @@ set_status_col(c)
  * and the character attribute in *ap.
  */
 	public int
-gline(i, ap)
+gline(i, ap, col)
 	register int i;
 	register int *ap;
+	register int *col;
 {
 	if (is_null_line)
 	{
@@ -1110,6 +1144,7 @@ gline(i, ap)
 			if (i == 0)
 			{
 				*ap = AT_BOLD;
+				*col = 0;
 				return '~';
 			}
 			--i;
@@ -1120,6 +1155,7 @@ gline(i, ap)
 	}
 
 	*ap = attr[i];
+	*col = color[i];
 	return (linebuf[i] & 0xFF);
 }
 

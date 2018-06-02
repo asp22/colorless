@@ -17,6 +17,8 @@ CPPFLAGS = @CPPFLAGS@
 EXEEXT = @EXEEXT@
 O=o
 
+CPP = @CPP@
+
 LIBS = @LIBS@
 
 prefix = @prefix@
@@ -42,6 +44,10 @@ SHELL = /bin/sh
 # in addition to whatever the user asks for.
 .c.o:
 	${CC} -I. ${CFLAGS_COMPILE_ONLY} -DBINDIR=\"${bindir}\" -DSYSDIR=\"${sysconfdir}\" ${CPPFLAGS} ${CFLAGS} $<
+.cpp.o:
+	${CC} -I. ${CFLAGS_COMPILE_ONLY} -DBINDIR=\"${bindir}\" -DSYSDIR=\"${sysconfdir}\" ${CPPFLAGS} ${CFLAGS} $<
+
+########
 
 OBJ = \
 	main.${O} screen.${O} brac.${O} ch.${O} charset.${O} cmdbuf.${O} \
@@ -51,10 +57,16 @@ OBJ = \
 	output.${O} pattern.${O} position.${O} prompt.${O} search.${O} signal.${O} \
 	tags.${O} ttyin.${O} version.${O}  @REGEX_O@
 
-all: less$(EXEEXT) lesskey$(EXEEXT) lessecho$(EXEEXT)
+CPPOBJ = \
+	 regexColor.${O} colorMe.${O} range.${O} colorMe_config.${O}
 
-less$(EXEEXT): ${OBJ}
-	${CC} ${LDFLAGS} -o $@ ${OBJ} ${LIBS}
+all: libColorMe less$(EXEEXT) lesskey$(EXEEXT) lessecho$(EXEEXT)
+
+libColorMe: ${CPPOBJ}
+	ar rvs libColorMe.a ${CPPOBJ}
+
+less$(EXEEXT): ${OBJ} libColorMe
+	${CC} ${LDFLAGS} -o $@ ${OBJ} ${LIBS} -L./ -lColorMe -lstdc++
 
 lesskey$(EXEEXT): lesskey.${O} version.${O}
 	${CC} ${LDFLAGS} -o $@ lesskey.${O} version.${O}

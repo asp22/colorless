@@ -51,6 +51,8 @@ forw_line(curr_pos)
 	int blankline;
 	int endline;
 	int backchars;
+	const char* line = NULL;
+	int lineLength = 0;
 
 get_forw_line:
 	if (curr_pos == NULL_POSITION)
@@ -100,6 +102,20 @@ get_forw_line:
 		}
 		--base_pos;
 	}
+
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	// pass to colorMe
+	if(!ColorMe_HaveProcessedLine(base_pos))
+	{
+		forw_raw_line(base_pos, &line, &lineLength);
+		if (lineLength > 0)
+			ColorMe_ProcessLine(base_pos, line, lineLength);
+		ch_seek(base_pos);
+	}
+
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
 
 	/*
 	 * Read forward again to the position we should start at.
@@ -256,6 +272,8 @@ back_line(curr_pos)
 	int c;
 	int endline;
 	int backchars;
+	const char* line = NULL;
+	int lineLength = 0;
 
 get_back_line:
 	if (curr_pos == NULL_POSITION || curr_pos <= ch_zero())
@@ -336,6 +354,15 @@ get_back_line:
 			base_pos = ch_tell();
 			break;
 		}
+	}
+
+	// Pass to colorMe
+	if (!ColorMe_HaveProcessedLine(base_pos))
+	{
+		forw_raw_line(base_pos, &line, &lineLength);
+		if (lineLength > 0)
+			ColorMe_ProcessLine(base_pos, line, lineLength);
+		ch_seek(base_pos);
 	}
 
 	/*

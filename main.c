@@ -13,6 +13,7 @@
  */
 
 #include "less.h"
+
 #if MSDOS_COMPILER==WIN32C
 #include <windows.h>
 #endif
@@ -59,6 +60,55 @@ extern int	know_dumb;
 extern int	pr_type;
 
 
+
+	static char *
+dirfile(dirname, filename)
+	char *dirname;
+	char *filename;
+{
+	char *pathname;
+	char *qpathname;
+	int len;
+	int f;
+
+	if (dirname == NULL || *dirname == '\0')
+		return (NULL);
+	/*
+	 * Construct the full pathname.
+	 */
+	len = (int) (strlen(dirname) + strlen(filename) + 2);
+	pathname = (char *) calloc(len, sizeof(char));
+	if (pathname == NULL)
+		return (NULL);
+	SNPRINTF3(pathname, len, "%s%s%s", dirname, PATHNAME_SEP, filename);
+	/*
+	 * Make sure the file exists.
+	 */
+	qpathname = shell_unquote(pathname);
+	f = open(qpathname, OPEN_READ);
+	if (f < 0)
+	{
+		free(pathname);
+		pathname = NULL;
+	} else
+	{
+		close(f);
+	}
+	free(qpathname);
+	return (pathname);
+}
+
+	static char *
+current_dir(cwd, sz)
+	char* cwd;
+       	int sz;
+{
+	if(getcwd(cwd, sz) != NULL)
+		return cwd;
+	else
+		return NULL;
+}
+
 /*
  * Entry point.
  */
@@ -69,6 +119,25 @@ main(argc, argv)
 {
 	IFILE ifile;
 	char *s;
+
+	char currentDir[1024];
+	current_dir(currentDir,1024);
+
+	char *colorPath = ".";
+	char *colorFilename = ".colorless";
+	char* homeFullPath = dirfile(lgetenv("HOME"), colorFilename);
+	char* currentFullPath = dirfile(currentDir, colorFilename);
+
+	ColorMe_Initialise();
+
+	if (currentFullPath == NULL)
+	{
+		ColorMe_Configure(lgetenv("HOME"), colorFilename);
+	}
+	else
+	{
+		ColorMe_Configure(colorPath, colorFilename);
+	}
 
 #ifdef __EMX__
 	_response(&argc, &argv);

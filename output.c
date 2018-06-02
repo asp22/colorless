@@ -40,6 +40,64 @@ extern int bl_fg_color, bl_bg_color;
 extern int sgr_mode;
 #endif
 
+void write_color(char fg, char bg)
+{
+	putchr('\x1B');
+	putchr('[');
+	putchr('0');
+	putchr(';');
+	putchr('3');
+	putchr(fg+48);
+	putchr(';');
+	putchr('4');
+	putchr(bg+48);
+	putchr('m');
+}
+
+void write_reset_esc()
+{
+	putchr('\x1B');
+	putchr('[');
+	putchr('m');
+}
+
+void write_red_esc()
+{
+	write_color(1,8);
+}
+
+void write_green_esc()
+{
+	write_color(2,8);
+}
+
+void write_yellow_esc()
+{
+	write_color(3,8);
+}
+
+void write_blue_esc()
+{
+	write_color(4,8);
+}
+
+void write_magneta_esc()
+{
+	write_color(5,8);
+}
+
+void write_cyan_esc()
+{
+	write_color(6,8);
+}
+
+void write_white_esc()
+{
+	write_color(7,8);
+}
+
+
+
 /*
  * Display the line which is in the line buffer.
  */
@@ -49,6 +107,8 @@ put_line()
 	register int c;
 	register int i;
 	int a;
+	int color=0;
+	int lastColor=0;
 
 	if (ABORT_SIGS())
 	{
@@ -61,17 +121,48 @@ put_line()
 
 	final_attr = AT_NORMAL;
 
-	for (i = 0;  (c = gline(i, &a)) != '\0';  i++)
+
+	for (i = 0;  (c = gline(i, &a, &color)) != '\0';  i++)
 	{
 		at_switch(a);
 		final_attr = a;
+
 		if (c == '\b')
 			putbs();
 		else
+		{
+			if (c == '\n')
+			{
+				if (lastColor != 0)
+				{
+					write_reset_esc();
+					lastColor = 0;
+				}
+			}
+			else if (lastColor != color)
+			{
+				write_reset_esc();
+				putchr('\x1B');
+				putchr('[');
+				if (a & AT_HILITE)
+				{
+					putchr('7');
+					//putchr(';');
+				}
+
+				if (color != 0)
+					putchr(';');
+
+				putstr(ColorMe_GetEscapeString(color));
+				lastColor = color;
+			}
+
 			putchr(c);
+		}
 	}
 
 	at_exit();
+	write_reset_esc();
 }
 
 static char obuf[OUTBUF_SIZE];
