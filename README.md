@@ -22,3 +22,4 @@ in your home folder you will need to create a ```.colorless``` file.  This will 
 - The code has been designed to work on *linux*; it may work on mac, but not in windows - sorry
 - you'll need a compiler that has c++ 14 support (The main colorizing logic has been written in C++)
 - Currently, the binary produced is named ```less```. Take care if you are running ```make install``` with sudo rights. I'll change the name in the future
+- My knowledge of ```make``` and ```Makefile```s is poor so I may have done things that don't work for you. Let me know and I'll try to fix it up.
