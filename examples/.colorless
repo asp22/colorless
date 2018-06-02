@@ -1,0 +1,17 @@
+RED_DEF
+YEL_DEF
+BLU_DEF
+GRE_DEF
+MAG_DEF
+CYA_DEF
+WHI_RED
+BLA_YEL 
+
+WHI_RED F ERROR
+BLA_YEL F WARNING
+CYA_DEF S [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{6}
+DEF_MAG S [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+
+GRE_DEF S true
+RED_DEF S false
+WHI_RED S disconnected
+WHI_GRE S connected

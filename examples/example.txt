@@ -1,0 +1,12 @@
+10:01:00.123456 it would be nice if the time stamps could be colored so that line wraps are easier to identify. Because some times lines go on and on and contain many numbers  10:10.0:00.0124 that sometimes look like timestamps
+10:02:00.123456 an interesting line which reports the value of a boolean true, false
+10:03:00.123456 nothing interesting in this line
+10:04:00.123456 there is an ERROR. This should be easily identifiable
+10:05:00.123456 some ip address 233.34.29.1
+10:06:00.123456 this line indicates we've connected 
+10:07:00.123456 nothing to see here
+10:08:00.123456 this line indicates we've disconnected
+10:09:00.123456 there is a WARNING. This should be easily identifiable.
+10:10:00.123456 nothing worth coloring here
+10:11:00.123456 lots of braces [123] [456]
+10:11:00.123456 nested braces [[123] [456] {{789}}]
