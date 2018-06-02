@@ -59,6 +59,23 @@ F - F is for Full.
 S - S is for Sub.
     If a match for the regular expression is found, color the matching string only
 ```
+# Quick Start
+After checking out the code
+```sh
+cd src
+./configure --prefix=$HOME/my/bin
+make
+make install
+```
+After it has built, you can test it by
+```sh
+# assuming you where in the src directory
+cd ..
+cd examples
+$HOME/my/bin/less example.txt
+```
+if everything worked out you should see an output that matches the example 'After'.
+
 
 # Limitations
 - The code has been designed to work on *linux*; it may work on mac, but not in windows - sorry
