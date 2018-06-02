@@ -1,4 +1,10 @@
+colorless - a fork of less - 487
 
+limitiations
+1. only works on linux
+2. requires gcc with c++14 support
+
+=========================================================================
                             Less, version 487
 
     This is the distribution of less, version 487, released 25 Oct 2016.
