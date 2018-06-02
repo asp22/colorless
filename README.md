@@ -9,12 +9,11 @@ At my current work, I make extensive use of less to review large text files and 
 
 ## Before
 
-![N|Solid](https://github.com/asp22/colorless/images/before.png)
+![Before Example](https://github.com/asp22/colorless/blob/master/images/before.png)
 
 ## After
 
-![N|Solid](https://github.com/asp22/colorless/images/after.png)
-
+![After Example](https://github.com/asp22/colorless/blob/master/images/after.png)
 
 # Limitations
 - The code has been designed to work on *linux*; it may work on mac, but not in windows - sorry
