@@ -45,7 +45,7 @@ WHI_RED S disconnected
 WHI_GRE S connected
 ```
 
-colorless supports 8 colors, red(RED), yellow(YEL), blue(blu), green(GRE), magenta(MAG), cyan(CYA), white(WHI), black(BLA) and the default terminal color (DEF). Color definitions take the form XXX_YYY, where XXX is the foreground color and YYY is the background color.
+colorless supports 8 colors, red(RED), yellow(YEL), blue(BLU), green(GRE), magenta(MAG), cyan(CYA), white(WHI), black(BLA) and the default terminal color (DEF). Color definitions take the form XXX_YYY, where XXX is the foreground color and YYY is the background color.
 
 The second part of the configure takes the following form
 ``` sh
