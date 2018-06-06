@@ -14,6 +14,7 @@ CFLAGS = @CFLAGS@
 CFLAGS_COMPILE_ONLY = -c
 LDFLAGS = @LDFLAGS@
 CPPFLAGS = @CPPFLAGS@
+CPP14 = -std=c++14
 EXEEXT = @EXEEXT@
 O=o
 
@@ -45,7 +46,7 @@ SHELL = /bin/sh
 .c.o:
 	${CC} -I. ${CFLAGS_COMPILE_ONLY} -DBINDIR=\"${bindir}\" -DSYSDIR=\"${sysconfdir}\" ${CPPFLAGS} ${CFLAGS} $<
 .cpp.o:
-	${CC} -I. ${CFLAGS_COMPILE_ONLY} -DBINDIR=\"${bindir}\" -DSYSDIR=\"${sysconfdir}\" ${CPPFLAGS} ${CFLAGS} $<
+	${CC} -I. ${CFLAGS_COMPILE_ONLY} -DBINDIR=\"${bindir}\" -DSYSDIR=\"${sysconfdir}\" ${CPPFLAGS} ${CFLAGS} ${CPP14} $<
 
 ########
 
