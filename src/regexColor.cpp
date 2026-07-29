@@ -85,7 +85,6 @@ bool RegexColor::HasColor(int32_t charPosition)
 {
 	for (auto&& kv : mColorToFullRange)
 	{
-		auto&& color = kv.first;
 		auto&& range = kv.second;
 
 		if (range.HasSeen(charPosition))
@@ -94,7 +93,6 @@ bool RegexColor::HasColor(int32_t charPosition)
 
 	for (auto&& kv : mColorToSubRange)
 	{
-		auto&& color = kv.first;
 		auto&& range = kv.second;
 
 		if (range.HasSeen(charPosition))
@@ -136,14 +134,14 @@ void RegexColor::ProcessForBraces(const int32_t startCharPosition, const char * 
 
 	auto nextColor = [&]() {
 		++colorIndex;
-		if (colorIndex == mBracesColors.size())
+		if (colorIndex == (int32_t)mBracesColors.size())
 			colorIndex = 0;
 	};
 
 	auto prevColor = [&]() {
 		--colorIndex;
 		if (colorIndex < 0)
-			colorIndex = mBracesColors.size() - 1;
+			colorIndex = (int32_t)mBracesColors.size() - 1;
 	};
 
 	const char* charPtr = start;
