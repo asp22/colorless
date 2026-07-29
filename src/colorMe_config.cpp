@@ -262,6 +262,8 @@ bool Config::IsCurrentLinePattern()
 	std::string matchType = mRegexMatches[2];
 	if (!IsValidMatchTypeString(matchType))
 		return false;
+
+	return true;
 }
 
 }
